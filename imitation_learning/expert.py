@@ -5,19 +5,15 @@ from abc import ABCMeta, abstractmethod
 
 class Expert(object):
     """Expert base class."""
-    __metaclass__ = ABCMeta
 
-    @abstractmethod
     def control_callback(self, msg):
         """Save the latest control command."""
         return [None, None]
 
-    @abstractmethod
     def cost_callback(self, msg):
         """Save the latest cost."""
         return None
 
-    @abstractmethod
     def status_callback(self, msg):
         """Save the latest status."""
         return None
