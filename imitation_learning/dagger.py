@@ -16,7 +16,6 @@ def rollout(logger, system, policy, T, N, expert=None, mixing=0.0,
         'rewards': []  # list of numbers
     }
 
-    # TODO: Fix since initial observation is causing mismatch
     mix = expert is not None and not np.isclose(mixing, 0.0)
     for r in range(N):
         logger.info('= Waiting for Rollout {} ='.format(r))
@@ -33,8 +32,9 @@ def rollout(logger, system, policy, T, N, expert=None, mixing=0.0,
                 use_imlearn = \
                     False if mix and np.random.random < mixing else True
             action = policy(obs)
-            target = action if use_imlearn else expert.action(obs)
-            obs, reward, done = system.step(target)
+            target = expert.action(obs)
+            action_step = action if use_imlearn else target
+            obs, reward, done = system.step(action_step)
             if not done:
                 for field, value in obs:
                     data['observations'][field].append(value)
@@ -200,7 +200,6 @@ def dagger(system, expert, learner, timesteps, rollouts, iterations,
     mixing = 1.0
     tparams = options.get('options_train', None)
     policy = learner.get_policy()
-    # TODO: Question: Isn't it get_policy(obsearvation)?
     mix_within_rollout = options.get('mix_within_rollout', True)
     for iter in range(iterations):
         mixing *= mixing_rate
